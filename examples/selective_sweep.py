@@ -77,7 +77,6 @@ def output_to_msprime(pop, recomb_collector, treefile_prefix, nsamples, mut_rate
             fn = treefile_prefix + output[0] + \
                 ("+{}".format(output[1]) if len(output)>1 else "") + ".hdf5"
             if mutations_after_simulation:
-                #to do - we should really add the focal mutation 
                 ts = add_mutations_retrospectively(ts, mut_rate)
                 ts.dump(fn)
             else:
@@ -159,7 +158,7 @@ def simulate_sweep(popsize, chrom_length, recomb_rate, mut_rate, selection_coef,
     """
     Carry out a simulation of a selective sweep, and save msprime-format files at frequencies
     specified by output_at_freqs, which is a list of (frequency, post_generation) tuples
-    
+    Note that some of these files may have fixed variants (i.e. mutations above the root node)
     """
     
     if seed is not None:
