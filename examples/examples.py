@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.5
 description = '''
-Simulate a chromosome with a single selected loci using simuPOP.
+Simulate a chromosome with a single selected locus using simuPOP.
 '''
 
 import gzip

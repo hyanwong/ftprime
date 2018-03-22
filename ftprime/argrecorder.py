@@ -40,9 +40,12 @@ class ARGrecorder(object):
         output IDs (node IDs in the tree sequence).
 
     1. Each time a new individual (chromosome) is born, record:
+    
         a. their birth time with ``add_individual``,
 
-        b. how their chromosome was inherited from her parents with ``add_record``.
+        b. how their chromosome was inherited from her parents with ``add_record``,
+
+        c. and any new mutations with ``add_mutation``. 
 
     2. Periodically, run ``simplify(samples)`` to remove unnecessary
         information from the recorded tables.  ``samples`` should be a list of
@@ -231,7 +234,7 @@ class ARGrecorder(object):
         '''
         if parent not in self.node_ids:
             raise ValueError("Parent " + str(parent) +
-                             "'s birth time has not been recorded with " +
+                             "’s birth time has not been recorded with " +
                              ".add_individual().")
         out_parent = self.node_ids[parent]
         out_children = tuple([self.node_ids[u] for u in children])
@@ -240,6 +243,26 @@ class ARGrecorder(object):
                                child=child,
                                left=left,
                                right=right)
+
+    def add_mutation(self, position, node, derived_state, ancestral_state):
+        """
+        Adds a new mutation to mutation table, and a new site if necessary as well.
+
+        :param float position: The chromosomal position of the mutation.
+        :param int node: The input ID of the individual on whose chromosome the
+            mutation occurred.  
+        :param string derived_state: The allele resulting from the mutation.
+        :param string ancestral_state: The original allele that the mutation
+            replaces (only used if this is the first mutation at this position).
+        """
+        if position not in self.site_positions:
+            site = self.sites.num_rows
+            self.sites.add_row(position=position, ancestral_state=ancestral_state)
+            self.site_positions[position] = site
+        else:
+            site = self.site_positions[position]
+        self.mutations.add_row(site=site, node=self.node_ids[node], 
+                               derived_state=derived_state)
 
     def update_times(self):
         """
@@ -263,7 +286,7 @@ class ARGrecorder(object):
     def simplify(self, samples):
         """
         Simplifies the underlying tables.  `samples` should be a list of all
-        "currently living" input individual IDs: i.e., anyone who might be a
+        'currently living' input individual IDs: i.e., anyone who might be a
         parent or a sample in the future.
 
         Note: to get the tree sequence for a set of samples use

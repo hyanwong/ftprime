@@ -210,3 +210,17 @@ class RecombCollector:
         self.args.nodes.set_columns(flags=self.args.nodes.flags,
                                     time=self.args.nodes.time,
                                     population=populations)
+    def tree_sequence(self, samples):
+            """
+            Returns a tree sequence, that retains only information relevant
+            to the diploid individuals listed in `samples`.
+            :param list samples: A list of diploid input individual IDs.
+            """
+            haploid_ids = [self.i2c(i,p) for i in samples for p in (0,1)]
+            return self.args.tree_sequence(haploid_ids)
+
+    def dump_sample_table(self, out):
+        """
+        TODO record here somehow which chromosomes here are in the same individual
+        """
+        self.args.dump_sample_table(out)
