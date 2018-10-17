@@ -95,28 +95,18 @@ class ARGrecorder(object):
             self.node_ids = dict(node_ids)
         # the actual tables that get updated
         #  DON'T actually store ts, just the tables:
-        if nodes is None:
-            nodes = msprime.NodeTable()
-            if ts is None:
-                for j, k in enumerate(sorted(self.node_ids.keys())):
-                    assert j == self.node_ids[k]
-                    nodes.add_row(population=msprime.NULL_POPULATION, time=time)
-        if edges is None:
-            edges = msprime.EdgeTable()
-        if sites is None:
-            sites = msprime.SiteTable()
-        if mutations is None:
-            mutations = msprime.MutationTable()
-        if migrations is None:
-            migrations = msprime.MigrationTable()
-        if ts is not None:
-            ts.dump_tables(nodes=nodes, edges=edges, sites=sites,
-                           mutations=mutations, migrations=migrations)
-        self.nodes = nodes
-        self.edges = edges
-        self.sites = sites
-        self.mutations = mutations
-        self.migrations = migrations
+        if ts is None:
+            tables = msprime.TableCollection()
+            for j, k in enumerate(sorted(self.node_ids.keys())):
+                assert j == self.node_ids[k]
+                tables.nodes.add_row(population=msprime.NULL_POPULATION, time=time)
+        else:
+            tables = ts.dump_tables()
+        self.nodes = tables.nodes
+        self.edges = tables.edges
+        self.sites = tables.sites
+        self.mutations = tables.mutations
+        self.migrations = tables.migrations
         if sequence_length is not None:
             if ts is not None:
                 if sequence_length != ts.sequence_length:
