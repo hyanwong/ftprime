@@ -273,17 +273,11 @@ class ARGrecorder(object):
         sample_nodes = self.get_nodes(samples)
         if self.timings is not None:
             start = timer.process_time()
-        msprime.sort_tables(nodes=self.nodes, edges=self.edges,
-                            sites=self.sites, mutations=self.mutations)
-        #                   migrations=self.migrations)
+        self.table_collection.sort()
         if self.timings is not None:
             start2 = timer.process_time()
             self.timings.time_sorting += start2 - start
-        msprime.simplify_tables(samples=sample_nodes, nodes=self.nodes, 
-                                edges=self.edges, sites=self.sites, 
-                                mutations=self.mutations, 
-                                sequence_length=self.sequence_length)
-        #                       migrations=self.migrations)
+        self.table_collection.simplify(samples=sample_nodes)
         if self.timings is not None:
             self.timings.time_simplifying += timer.process_time() - start2
         # update the internal state
