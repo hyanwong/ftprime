@@ -102,6 +102,7 @@ class ARGrecorder(object):
                 tables.nodes.add_row(population=msprime.NULL_POPULATION, time=time)
         else:
             tables = ts.dump_tables()
+        self.table_collection = tables
         self.nodes = tables.nodes
         self.edges = tables.edges
         self.sites = tables.sites
@@ -312,16 +313,11 @@ class ARGrecorder(object):
         self.update_times()
         if self.timings is not None:
             start = timer.process_time()
-        msprime.sort_tables(nodes=self.nodes, edges=self.edges,
-                            sites=self.sites, mutations=self.mutations)
-        #                   migrations=self.migrations)
+        self.table_collection.sort()
         self.mark_samples(samples)
         if self.timings is not None:
             self.timings.time_sorting += start - timer.process_time()
-        ts = msprime.load_tables(nodes=self.nodes, edges=self.edges,
-                                 sites=self.sites, mutations=self.mutations,
-                                 sequence_length=self.sequence_length)
-        #                        migrations=self.migrations)
+        ts = self.table_collection.tree_sequence()
         sample_nodes = self.get_nodes(samples)
         return ts.simplify(samples=sample_nodes)
 
@@ -357,3 +353,4 @@ class ARGrecorder(object):
         self.nodes.set_columns(time=self.nodes.time,
                                population=self.nodes.population,
                                flags=new_flags)
+
